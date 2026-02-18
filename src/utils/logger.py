@@ -31,9 +31,9 @@ class Logger:
     def _log(header: LogStyle, body: str, is_date: bool):
         """Internal helper, assembles print message"""
 
-        is_date = Logger._is_show_date(is_date)
+        str_date = Logger._is_show_date(is_date)
 
-        print(f"{is_date}{header} {body}")
+        print(f"{str_date}{header} {body}")
     
     @staticmethod
     def info(msg: str, d: bool = True): Logger._log(Logger._STYLES.INFO, msg, d)
