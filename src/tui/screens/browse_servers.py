@@ -4,11 +4,13 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.containers import Container, Horizontal
 from textual.widgets import Header, Footer, OptionList, Label, Button
-from src.tui.widgets.nordic_logo import NordicLogo
+from tui.widgets.nordic_logo import NordicLogo
+from tui.constants import ElementID
 from tui.controllers.server_controller import ServerController
 from tui.widgets.ServerList import ServerList
 from tui.interfaces import AppInterface
-from src.models.server import Server
+from models.server import Server
+from utils.logger import Logger
 
 
 class BrowseServers(Screen): 
@@ -25,27 +27,39 @@ class BrowseServers(Screen):
         yield Header(show_clock=True) 
 
         with Horizontal(): # Main layout
-
-            with Container(id="sidebar"): # Sidebar
+            # Sidebar
+            with Container(id=ElementID.CNR_SIDEBAR.id):
                 # Logo
                 yield NordicLogo()
                 # Sub-title
-                yield Label("SERVERS", id="list-title")
+                yield Label(ElementID.LBL_LIST_TITLE.title, 
+                            id=ElementID.LBL_LIST_TITLE.id
+                            )
                 # Server List
-                yield ServerList(id="server-list")
+                yield ServerList(id=ElementID.LIST_SERVER.id)
 
-            with Container(id="main-panel"): # Main panel
+            # Main panel
+            with Container(id=ElementID.CNR_MAIN.id): 
                 # Sub-title
-                yield Label("SERVER DETAILS", id="details-title")
+                yield Label(ElementID.LBL_SERVER_DETAILS.title,
+                            id=ElementID.LBL_SERVER_DETAILS.id 
+                            )
                 # Server details
-                yield Label("Select a server to see options.", id="details-msg")
+                yield Label(ElementID.LBL_DETAILS_MSG.title, 
+                            id=ElementID.LBL_DETAILS_MSG.id
+                            )
                 # Menu frame
-                with Container(classes="menu-card"):
+                with Container(classes=ElementID.CNR_MENU_CARD.clazz):
                     # Actions
-                    yield Button("Connect", id="btn-connect-selected", classes="btn-connect")
-                    yield Button("Add Favorite", id="btn-fav-selected")
-                    yield Button("Back to Menu", id="btn-back")
-
+                    yield Button(ElementID.BTN_CONNECT.title, 
+                                 id=ElementID.BTN_CONNECT.id, 
+                                 classes=ElementID.BTN_CONNECT.clazz
+                                 )
+                    yield Button(ElementID.BTN_FAV_ADD.title,
+                                 id=ElementID.BTN_FAV_ADD.id)
+                    yield Button(ElementID.BTN_RETURN.title, 
+                                 id=ElementID.BTN_RETURN.id
+                                 )
             yield Footer()
 
     def on_mount(self) -> None:
@@ -62,8 +76,8 @@ class BrowseServers(Screen):
         self.run_worker(lambda: self.controller.load_servers(self), thread=True, exclusive=True)
 
         # Cache freq. accessed widgets
-        self.details_label = self.query_one("#details-msg", Label)
-        self.server_list = self.query_one("#server-list", ServerList)
+        self.details_label = self.query_one(f"#{ElementID.LBL_DETAILS_MSG.id}", Label)
+        self.server_list = self.query_one(f"#{ElementID.LIST_SERVER.id}", ServerList)
 
     def update_list(self, servers: list[Server]) -> None:
         """
@@ -86,7 +100,7 @@ class BrowseServers(Screen):
         
         self.details_label.update( # Update details panel
             f"Targeting: {self.selected_server.DISPLAY_NAME}\n"
-            f"Location: {self.selected_server.CITY}, {self.selected_server.COUNTRY_CODE}\n"
+            f"Location:  {self.selected_server.CITY}, {self.selected_server.COUNTRY_CODE}\n"
             f"Continent: {self.selected_server.CONTINENT}"
         )
 
@@ -99,16 +113,18 @@ class BrowseServers(Screen):
         """
         btn_id = event.button.id # Clicked button event-id
 
-        if btn_id == "btn-back": # Route actions
-            self.app.pop_screen() # back to main-screen
+        # Route actions
+        match btn_id:
+            case ElementID.BTN_RETURN.id: # back to main-screen
+                self.app.pop_screen() 
+            case ElementID.BTN_CONNECT.id: # VPN CONNECT
+                server = self.selected_server
 
-        elif btn_id == "btn-connect-selected":
-            server = self.selected_server
-
-            if server is not None:
-                # Offloading for the vpn to establisg a connection
-                self.run_worker(lambda: self.controller.connect_to(server), thread=True, exclusive=True)
-            else:
-                self.notify("Please select a server first!", severity="error")
-        
+                if server is not None:
+                    # Offloading for the vpn to establisg a connection
+                    self.run_worker(lambda: self.controller.connect_to(server), thread=True, exclusive=True)
+                else:
+                    self.notify("Please select a server first!", severity="error")
+            case _:
+                Logger.error("Unknown button pressed.")
     

@@ -3,9 +3,11 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Header, Footer, Button, Label
 from textual.containers import Container, Horizontal
-from src.tui.widgets.nordic_logo import NordicLogo
+from tui.widgets.nordic_logo import NordicLogo
 from tui.controllers.main_controller import MainController
 from tui.interfaces import AppInterface
+from tui.constants import ElementID, ScreenID
+from utils.logger import Logger
 
 class MainMenu(Screen):
     """
@@ -21,20 +23,32 @@ class MainMenu(Screen):
         yield Header(show_clock=True)
 
         with Horizontal(): # Main layout
-            
-            with Container(id="sidebar"): # Sidebar
+            # Sidebar
+            with Container(id=ElementID.CNR_SIDEBAR.id):
                 # Logo
                 yield NordicLogo()
-
-            with Container(id="main-panel"): # Main panel
+            # Main panel
+            with Container(id=ElementID.CNR_MAIN.id):
                 # Menu frame
-                with Container(classes="menu-card"):
+                with Container(classes=ElementID.CNR_MENU_CARD.clazz):
                     # Actions
-                    yield Button("Quick Connect", id="btn-q-connect", classes="btn-connect")
-                    yield Button("Browse Servers", id="btn-browse")
-                    yield Button("Favorites", id="btn-fav")
-                    yield Button("Disconnect", id="btn-disconnect", classes="btn-disconnect")
-                    yield Button("Exit", id="btn-exit", classes="btn-exit")
+                    yield Button(ElementID.BTN_Q_CONNECT.title, 
+                                 id=ElementID.BTN_Q_CONNECT.id, 
+                                 classes=ElementID.BTN_Q_CONNECT.clazz
+                                 )
+                    yield Button(ElementID.BTN_BROWSE_SERVER.title, 
+                                 id=ElementID.BTN_BROWSE_SERVER.id
+                                 )
+                    yield Button(ElementID.BTN_FAV_SERVER.title,
+                                 id=ElementID.BTN_FAV_SERVER.id
+                                 )
+                    yield Button(ElementID.BTN_DISCONNECT.title,
+                                 id=ElementID.BTN_DISCONNECT.id,
+                                 classes=ElementID.BTN_DISCONNECT.clazz
+                                 )
+                    yield Button(ElementID.BTN_EXIT.title, 
+                                 id=ElementID.BTN_EXIT.id,
+                                 classes=ElementID.BTN_EXIT.clazz)
 
             yield Footer()
 
@@ -56,16 +70,16 @@ class MainMenu(Screen):
         """
         btn_id = event.button.id # clicked button event-id
 
-        if btn_id == "btn-exit": # Route actions
-            self.app.exit()
-
-        elif btn_id == "btn-browse":
-            self.app.push_screen("browse")
-
-        elif btn_id =="btn-q-connect":
-            self.notify("Connecting...", severity="information")
-        
-        elif btn_id == "btn-disconnect":
-            # Offloading for the vpn to disconnect
-            self.run_worker(lambda: self.controller.disconnect(), thread=True, exclusive=True)
-        
+        # Route actions
+        match btn_id:
+            case ElementID.BTN_EXIT.id: # back to main-screen
+                self.app.exit() 
+            case ElementID.BTN_BROWSE_SERVER.id: # Server-screen
+                self.app.push_screen(ScreenID.BROWSE_SERVERS.id)
+            case ElementID.BTN_Q_CONNECT.id: # VPN CONNECT
+                self.notify("Connecting...", severity="information")
+            case ElementID.BTN_DISCONNECT.id: # VPN DISCONNECT
+                # Offloading for the vpn to disconnect
+                self.run_worker(lambda: self.controller.disconnect(), thread=True, exclusive=True)
+            case _:
+                Logger.error("Unknown button pressed.")
