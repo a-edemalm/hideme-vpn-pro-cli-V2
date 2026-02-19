@@ -1,0 +1,133 @@
+/* ==========================================================================
+   NORDIC THEME VARIABLES (The "Soul")
+   ========================================================================== */
+$bg-dark: #2E3440;       /* nord0 */
+$bg-card: #3B4252;       /* nord1 */
+$bg-select: #434C5E;     /* nord2 */
+$text-main: #ECEFF4;     /* nord6 */
+$text-dim: #4C566A;      /* nord3 */
+
+$accent: #88C0D0;        /* nord8 (Cyan) */
+$success: #A3BE8C;       /* nord14 (Green) */
+$warning: #EBCB8B;       /* nord13 (Yellow) */
+$error: #BF616A;         /* nord11 (Red) */
+
+/* ==========================================================================
+   GLOBAL SETTINGS
+   ========================================================================== */
+Screen {
+    background: $bg-dark;
+    color: $text-main;
+    align: center middle;
+}
+
+Header {    
+    background: $bg-card;
+    dock: top;
+}
+
+Footer {
+    background: $bg-card;
+    color: $text-dim;
+    dock: bottom;
+}
+
+* {
+    scrollbar-size: 1 1;             
+    scrollbar-color: $bg-select;    
+    scrollbar-color-hover: $accent;   
+    scrollbar-color-active: $accent; 
+    scrollbar-background: transparent;
+    scrollbar-background-hover: transparent;
+    scrollbar-background-active: $bg-select;
+}
+
+/* ==========================================================================
+   LAYOUT & CONTAINERS
+   ========================================================================== */
+.menu-card {
+    width: 50;
+    height: auto;
+    max-height: 100%;
+    background: $bg-card;
+    border: heavy $accent;
+    padding: 0 1; /* HEIGHT SIDES */
+    margin: 1 0; /* HEIGHT SIDES */
+    content-align: center middle; 
+    overflow-y: auto;
+}
+
+#sidebar {
+    width: 35%;
+    height: 100%;
+    background: $bg-dark;
+    border-right: solid $bg-card;
+    padding: 0 1; /* HEIGHT SIDES */
+}
+
+#main-panel {
+    width: 65%;
+    height: 100%;
+    background: $bg-dark;
+    padding: 0 2; /* HEIGHT SIDES */
+}
+
+#list-title {
+    text-style: bold;
+    color: $accent;
+    margin: 1 0 1 0; /* TOP RIGHT BOTTOM LEFT */
+}
+
+/* ================
+   DETAILS PANEL ELEMENTS
+   ================ */
+#details-title {
+    text-style: bold;
+    color: $accent;
+    margin: 1 0 1 0; /* TOP RIGHT BOTTOM LEFT */
+}
+
+#details-msg {
+    background: $bg-card;
+    padding: 1 1; /* HEIGHT SIDES */
+    height: 5;
+    width: 50;
+}
+
+/* ==========================================================================
+   INTERACTIVE ELEMENTS (Buttons)
+   ========================================================================== */
+Button {
+    width: 100%;
+    height: 3;
+    margin: 1 1 1 1;
+    border-left: solid $accent;
+    background: $bg-dark;
+    color: $text-main;
+    text-style: bold;
+}
+
+Button:hover {
+    background: $accent;
+    color: $bg-dark;
+}
+
+.btn-connect {
+    color: $success;
+    border-left: solid $success;
+}
+
+.btn-connect:hover {
+    background: $success;
+    color: $bg-dark;
+}
+
+.btn-disconnect {
+    color: $error;
+    border-left: solid $error;
+}
+
+.btn-disconnect:hover {
+    background: $error;
+    color: $bg-dark;
+}
