@@ -1,46 +1,52 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from models.connection_info import ConnectionInfo
-from src.models.server import Server
+
+from core.dtos import IpCheckDto, ServerDto
+
 
 class IServiceManager(ABC):
     """
-    Interface for service management system
+    Interface for service management system.
     """
-    @abstractmethod
-    def start(self, unit_name: str) -> bool: ...
 
     @abstractmethod
-    def stop(self, unit_name: str) -> bool: ...
+    async def start(self, unit_name: str) -> bool: ...
 
     @abstractmethod
-    def is_active(self, unit_name: str) -> bool: ...
+    async def stop(self, unit_name: str) -> bool: ...
 
-    @abstractmethod 
-    def list_active(self, pattern: str) -> List[str]: ...
+    @abstractmethod
+    async def is_active(self, unit_name: str) -> bool: ...
+
+    @abstractmethod
+    async def list_active(self, pattern: str) -> List[str]: ...
+
 
 class INetworkMonitor(ABC):
     """
     Interface for checking network state.
     """
+
     @abstractmethod
-    def is_tunnel_interface(self) -> bool: ...
+    async def is_tunnel_interface(self) -> bool: ...
+
 
 class IVpnProvider(ABC):
     """
-    Interface for VPN provider
+    Interface for VPN provider.
     """
-    @abstractmethod
-    def fetch_servers(self) -> List[Server]: ...
 
     @abstractmethod
-    def connect(self, server: Server) -> bool: ...
+    async def fetch_servers(self) -> List[ServerDto]: ...
 
     @abstractmethod
-    def disconnect(self) -> bool: ...
+    async def connect(self, server: ServerDto) -> bool: ...
 
     @abstractmethod
-    def get_connectivity(self) -> Optional[ConnectionInfo]: ...
+    async def disconnect(self) -> bool: ...
 
     @abstractmethod
-    def is_connected(self) -> bool: ...
+    async def get_connectivity(self) -> Optional[IpCheckDto]: ...
+
+    @abstractmethod
+    async def is_connected(self) -> bool: ...
