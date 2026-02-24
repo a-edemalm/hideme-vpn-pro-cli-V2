@@ -1,32 +1,37 @@
-import time
+from typing import Any, Dict, Optional
+
 import httpx
-from typing import Any, Optional, Dict
+
 from src.utils.logger import Logger
+
 
 class HttpClient:
     """
-    
+    Wrapper for httpx to handle synchronous requests.
     """
+
     def __init__(self, timeout: int = 10):
-        self._client = httpx.Client(timeout=timeout)
         self._timeout = timeout
-        
-    def get(self, url: str, params: Optional[Dict] = None) -> Any:
+
+        self._async_client = httpx.AsyncClient(timeout=timeout)
+
+    async def get_async(self, url: str, params: Optional[Dict] = None) -> Any:
+        """
+        Executes GET request.
+        :param url: Target endpoint
+        :param params: Optional query parameters
+        """
         try:
-            response = self._client.get(url, params=params, timeout=self._timeout)
+            response = await self._async_client.get(url, params=params)
             response.raise_for_status()
-
             return response.json()
-        
-        except httpx.HTTPError as e:
-            Logger.error(f"HTTP request failed: {e}", True)
-            raise
-        
-    def close(self): 
-        self._client.close()
 
-    def __enter__(self):
-        return self
-    
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
+        except httpx.HTTPError as e:
+            Logger.error(f"Async HTTP request failed: {e}")
+            return None
+
+    async def close(self):
+        """
+        Cleanup client resources.
+        """
+        await self._async_client.aclose()
