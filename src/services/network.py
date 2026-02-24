@@ -1,35 +1,43 @@
-import os
+import asyncio
 from pathlib import Path
-from typing import Optional
+
 from src.core.interfaces import INetworkMonitor
-from src.models.enums import HideMeConfig
 from src.utils.logger import Logger
+
 
 class NetworkService(INetworkMonitor):
     """Detects VPN interfaces via the Linux filesystem directly."""
-    
-    SYS_NET = Path("/sys/class/net")
 
-    def is_tunnel_interface(self) -> bool:
+    _TUNNEL = "vpn"
+    _UP_STATES = ["up", "unknown"]
+    _SYS_NET_PATH = Path("/sys/class/net")
+
+    async def is_tunnel_interface(self) -> bool:
+        return await asyncio.to_thread(self._is_tunnel_interface_sync)
+
+    def _is_tunnel_interface_sync(self) -> bool:
         """
         Scans /sys/class/net to find virtual tunnels.
         """
-        
-        try: 
+        prefixes = ("tun", self._TUNNEL)
 
-            for iface in self.SYS_NET.iterdir():
-                if iface.name.startswith(('tun', HideMeConfig.IFACE.TUNNEL)):
-                    
-                    state_file = iface / "operstate"
-                    if state_file.exists():
-                        current_status = state_file.read_text().strip()
-                        
-                        if  current_status in HideMeConfig.IFACE.IS_STATE_UP: 
-                            return True
-        
+        try:
+            for iface in self._SYS_NET_PATH.iterdir():
+                if not iface.name.startswith(prefixes):
+                    continue
+
+                file = iface / "opperstate"
+                if not file.is_file():
+                    continue
+
+                status = file.read_text().strip().lower()
+                if status in self._UP_STATES:
+                    return True
+
         except Exception as e:
-            Logger.warning(f"Failed retrieving tunnel interface: {e}", True)
+            Logger.warning(
+                f"Unexpected error, failed retrieving tunnel interface: {e}", True
+            )
             return False
-        
+
         return False
-        
