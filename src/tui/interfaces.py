@@ -1,30 +1,29 @@
 from abc import abstractmethod
-from typing import Protocol, List, Any
-from src.models.server import Server
+from typing import TYPE_CHECKING, Any, Protocol
+
+if TYPE_CHECKING:
+    from services.config_manager import ConfigManager
+    from services.config_service import ConfigService
+    from tui.widgets.ip_check import IpCheckWidget
+
 
 class AppInterface(Protocol):
     """
     Defines core application functionality for controllers
     """
+
     vpn_service: Any
+    conf_mgr: "ConfigManager"
+    conf_ser: "ConfigService"
+    ip_check: "IpCheckWidget"
 
     @abstractmethod
-    def call_from_thread(self, callback: Any, *args: Any) -> None: 
-        """
-        Executes a function on the main TUI thread safely
-
-        :param self: Instance reference
-        :param callback: The function to be executed
-        :param args: Arguments passed to the callback function
-        """
-        ...
-        
-
-    @abstractmethod
-    def notify(self, message: str, title: str = "", severity: str = "information") -> None:
+    def notify(
+        self, message: str, title: str = "", severity: str = "information"
+    ) -> None:
         """
         Displays a notification toast in the UI
-        
+
         :param self: Instance reference
         :param message: The text body of the notification
         :param title: Optional headline for the toast
@@ -32,17 +31,5 @@ class AppInterface(Protocol):
         """
         ...
 
-class ScreenInterface(Protocol):
-    """
-    Default interface for screens, displaying ui. 
-    """
     @abstractmethod
-    def update_list(self, servers: List[Server]) -> None: 
-        """
-        Updates the server list widget with the new data
-
-        :param self: Instance reference
-        :param servers: List of Server objects to dsiplay
-        """
-        ...
-        
+    def trigger_ip_refresh(self) -> None: ...
