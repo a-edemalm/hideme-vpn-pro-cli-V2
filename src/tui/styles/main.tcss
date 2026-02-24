@@ -72,28 +72,6 @@ Footer {
     padding: 0 2; /* HEIGHT SIDES */
 }
 
-#list-title {
-    text-style: bold;
-    color: $accent;
-    margin: 1 0 1 0; /* TOP RIGHT BOTTOM LEFT */
-}
-
-/* ================
-   DETAILS PANEL ELEMENTS
-   ================ */
-#details-title {
-    text-style: bold;
-    color: $accent;
-    margin: 1 0 1 0; /* TOP RIGHT BOTTOM LEFT */
-}
-
-#details-msg {
-    background: $bg-card;
-    padding: 1 1; /* HEIGHT SIDES */
-    height: 5;
-    width: 50;
-}
-
 /* ==========================================================================
    INTERACTIVE ELEMENTS (Buttons)
    ========================================================================== */
