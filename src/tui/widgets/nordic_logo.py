@@ -1,10 +1,11 @@
 from textual.app import RenderResult
 from textual.widget import Widget
 
+
 class NordicLogo(Widget):
     """
     The application logo, featuring DEFAULT CSS.
-    """ 
+    """
 
     DEFAULT_CSS = """
     NordicLogo {
