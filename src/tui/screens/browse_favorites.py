@@ -4,7 +4,7 @@ from textual import on, work
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal
 from textual.events import Mount, ScreenResume, ScreenSuspend
-from textual.screen import Screen  # Correct import
+from textual.screen import Screen
 from textual.widgets import Button, Footer, Header
 
 from core.dtos import Server
@@ -16,7 +16,7 @@ from tui.widgets.server_details_widget import ServerDetailsWidget
 from tui.widgets.ServerList import ServerListWidget
 
 
-class BrowseAllServers(Screen):
+class BrowseFavorites(Screen):
     app_ref: AppInterface
     controller: ServerController
     selected_server: Server | None = None
@@ -35,23 +35,22 @@ class BrowseAllServers(Screen):
                 yield NordicLogo()
                 # Server List
                 yield ServerListWidget()
-
-            # Main Panel
+            # Main panel
             with Container(id="main-panel"):
-                # ServerDetails
+                # Server details
                 yield ServerDetailsWidget()
                 # Menu frame
                 with Container(classes="menu-card"):
-                    # actions
+                    # Actions
                     yield Button("Connect", id="btn-connect", classes="btn-connect")
                     yield FavoriteButton(id="btn-favorite")
                     yield Button("Back to Menu", id="btn-return")
         yield Footer()
 
-    # --- SCRREN STATES ---
+    # --- SCREEN STATES ---
 
     @on(Mount)
-    def on_mount(self) -> None:
+    def handle_mount(self) -> None:
         """Initializes screen and controller"""
         self.app_ref = cast(
             AppInterface, self.app
@@ -63,12 +62,12 @@ class BrowseAllServers(Screen):
         self.details_label = self.query_one(ServerDetailsWidget)
         self.fav_button = self.query_one(FavoriteButton)
 
-        # Initial State
+        # Hides button
         self.fav_button.display = False
         self._run_refresh_data()
 
     @on(ScreenResume)
-    def handle_resume(self, event: ScreenResume) -> None:
+    def handle_resume(self) -> None:
         """Refresh data on resume"""
         self._run_refresh_data()
 
@@ -95,9 +94,11 @@ class BrowseAllServers(Screen):
         """
         self.selected_server = event.server
 
+        # details label
         self.details_label.display = True
         self.details_label.selected_server = self.selected_server
 
+        # Favorite button
         self.fav_button.server = self.selected_server
         self.fav_button.is_favorite = self.selected_server.IS_FAVORITE
         self.fav_button.display = True
@@ -108,9 +109,9 @@ class BrowseAllServers(Screen):
         Forward toggle request
         :param event: Request event containing server object
         """
-        self._run_toggle_favorite(event.server)
+        self._run_toggle_favorite(event)
 
-    # --- on BUTTON Press ---
+    # --- BUTTON PRESS ---
 
     @on(Button.Pressed, "#btn-connect")
     def on_connect_pressed(self, event: Button.Pressed) -> None:
@@ -123,7 +124,7 @@ class BrowseAllServers(Screen):
     # --- NAVIGATION ---
 
     @on(Button.Pressed, "#btn-return")
-    def on_return_pressed(self, event: Button.Pressed) -> None:
+    def on_return_pressed(self) -> None:
         """Back to menu"""
         self.app.pop_screen()
 
@@ -131,10 +132,10 @@ class BrowseAllServers(Screen):
 
     @work
     async def _run_refresh_data(self) -> None:
-        """Reload all servers"""
-        self.server_list.servers = await self.controller.load_servers()
+        """Reload all favorite servers"""
+        self.server_list.servers = await self.controller.load_servers_favorite()
 
-    @work(exclusive=True)  # PREVENTS SPAM CLICKING
+    @work(exclusive=True)
     async def _run_connect(self, server: Server) -> None:
         """
         Execute connection
@@ -153,12 +154,18 @@ class BrowseAllServers(Screen):
             )
 
     @work
-    async def _run_toggle_favorite(self, server: Server) -> None:
+    async def _run_toggle_favorite(self, event: FavoriteButton.ToggleRequest) -> None:
         """
         Process server favorite toggle
         :param server: Server object to toggle
         """
-        is_now_fav = await self.controller.toggle_favorite(server)
-        self.fav_button.is_favorite = is_now_fav
-        status = "Added to" if is_now_fav else "Removed from"
-        self.notify(f"{status} favorites.")
+        is_now_fav = await self.controller.toggle_favorite(event.server)
+
+        # UI Response: If selected server removed
+        if not is_now_fav:
+            self.selected_server = None
+            self.details_label.reset_details()
+            self.fav_button.display = False
+            self._run_refresh_data()
+
+        self.notify("Updated favorites.")
