@@ -104,3 +104,8 @@ class Server:
 
     # FAVORITE.json
     IS_FAVORITE: bool = False
+
+    @property
+    def service_name(self) -> str:
+        """Helper method for systemd-name-flag"""
+        return self.FLAG

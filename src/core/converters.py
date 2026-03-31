@@ -101,6 +101,21 @@ def server_dto_to_server(dto: ServerDto) -> Server:
     )
 
 
+def server_to_server_dto(server: Server) -> ServerDto:
+    """Maps from UI server, back to DTO for backend-service"""
+    return ServerDto(
+        ID=server.ID,
+        HOSTNAME=server.HOSTNAME,
+        FLAG=server.FLAG,
+        CITY=server.CITY,
+        COUNTRY_CODE=server.COUNTRY_CODE,
+        COUNTRY=server.COUNTRY,
+        CONTINENT=server.CONTINENT,
+        LAT=0.0,
+        LON=0.0,
+    )
+
+
 def server_to_favorite_dto(server: Server) -> FavoriteDto:
     return FavoriteDto(
         ID=server.ID,
