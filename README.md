@@ -49,10 +49,6 @@ The project is organised into distinct layers:
 * **hide.me CLI (by eventure):** This TUI acts as a wrapper for the eventure implementation. Ensure the CLI is installed and functional on your system.
 
 ### Setup
-Detailed instructions for cloning the repository, setting up the virtual environment, and adding the script to your system's PATH are available in the dedicated **[INSTALL.md](INSTALL.md)** file.
+Detailed installation instructions, including automated setup scripts and environment configuration, are **currently under development** and will be released in the near future. 
 
-## Usage
-
-To launch the application, run:
-```bash
-python src/main.py
+Advanced users may currently run the application by manually configuring a virtual environment and installing dependencies from the `requirements.txt` file.
