@@ -70,13 +70,14 @@ class MainMenu(Screen):
     def handle_resume(self) -> None:
         """Refresh data on resume"""
         # Accessed widgets
-        self.app_ref.ip_check.visible = True
+        self.app_ref.ip_check.display = True
 
     @on(ScreenSuspend)
     def handle_suspend(self) -> None:
         """Clean screen state on leave"""
         # Accessed widgets
-        self.app_ref.ip_check.reset_details()
+        # self.app_ref.ip_check.reset_details()
+        self.app_ref.ip_check.display = False
 
     # --- UI INTERACTION --
 
@@ -111,7 +112,7 @@ class MainMenu(Screen):
 
     # --- BACKGROUND TASKS ---
 
-    @work(exclusive=True)
+    @work(exclusive=True)  # PREVENTS SPAM CLICKING
     async def _run_quick_connect(self) -> None:
         """Execute quick connection, most recent server"""
         if await self.controller.connect_quick():
@@ -120,7 +121,7 @@ class MainMenu(Screen):
         else:
             self.notify("No recent server found", severity="warning")
 
-    @work(exclusive=True)
+    @work(exclusive=True)  # PREVENTS SPAM CLICKING
     async def _run_disconnect(self) -> None:
         """Execute disconnection"""
         if await self.controller.disconnect():
