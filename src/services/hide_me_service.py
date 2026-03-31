@@ -60,7 +60,7 @@ class HideMeService(IVpnProvider):
             return None
 
     async def connect(self, server: ServerDto) -> bool:
-        unit = f"{self._PREFIX}{server.FLAG}.service"
+        unit = f"{self._PREFIX}{server.service_name}.service"
 
         try:
             if not await self.disconnect():
