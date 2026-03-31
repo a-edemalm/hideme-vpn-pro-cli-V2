@@ -62,10 +62,6 @@ class BrowseFavorites(Screen):
         self.details_label = self.query_one(ServerDetailsWidget)
         self.fav_button = self.query_one(FavoriteButton)
 
-        # Hides button
-        self.fav_button.display = False
-        self._run_refresh_data()
-
     @on(ScreenResume)
     def handle_resume(self) -> None:
         """Refresh data on resume"""
@@ -130,12 +126,12 @@ class BrowseFavorites(Screen):
 
     # --- BACKGROUND TASKS ---
 
-    @work
+    @work(exclusive=True)  # PREVENTS SPAM CLICKING
     async def _run_refresh_data(self) -> None:
         """Reload all favorite servers"""
         self.server_list.servers = await self.controller.load_servers_favorite()
 
-    @work(exclusive=True)
+    @work(exclusive=True)  # PREVENTS SPAM CLICKING
     async def _run_connect(self, server: Server) -> None:
         """
         Execute connection
@@ -153,7 +149,7 @@ class BrowseFavorites(Screen):
                 "The VPN failed to connect.", title="VPN Failed", severity="error"
             )
 
-    @work
+    @work(exclusive=True)
     async def _run_toggle_favorite(self, event: FavoriteButton.ToggleRequest) -> None:
         """
         Process server favorite toggle
