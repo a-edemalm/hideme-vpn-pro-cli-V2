@@ -13,7 +13,7 @@ There are several areas where the project is currently being improved:
 * **Source Documentation:** Improving docstring coverage and type-hinting to meet professional Python standards.
 * **Architectural Refinement:** Ongoing work to further decouple domain logic from infrastructure (Schema/Model separation).
 * **Functionality Expansion:** Implementation of **Port Forwarding**, **Open Port** testing, and expanded user settings.
-* **Stability:** General bug fixing and stabilising asynchronous workers to prevent race conditions.
+* **Stability:** General bug fixing and stabilising asynchronous workers to further prevent race conditions.
 
 ## Showcase
 
@@ -31,7 +31,7 @@ There are several areas where the project is currently being improved:
 * **Systemd Integration:** Manages VPN connections as system services via `pystemd`.
 * **Asynchronous Architecture:** Non-blocking network requests and system commands.
 * **Favourite Management:** Save frequently used servers locally for rapid access.
-* **Real-time IP Verification:** Automatic connection status monitoring and IP leak protection.
+* **Real-time IP Verification:** Automatic connection status monitoring.
 
 ## Architecture
 
